@@ -6,9 +6,24 @@ import decimal
 import matplotlib as plt
 
 
+def directory_get():
+
+    og_path = os.path.dirname(os.path.abspath(__file__))
+
+    og_path_1 = og_path.split('\\')
+    length = len(og_path_1)
+    og_path_1 = og_path_1[length-1]
+
+    og_path = og_path.split(f'{og_path_1}')[0]
+
+    return og_path
+
+
 def new_path(factor_mult):
 
-    newdirectory = f'C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\NACA_Coordinates\\{factor_mult}_winglength\\'
+    directory = directory_get()
+
+    newdirectory = f'{directory}{factor_mult}_winglength\\'
 
     if not os.path.exists(newdirectory):
 
@@ -26,7 +41,9 @@ def plotting(csv_file):
 
 def warehouse():
 
-    directory = 'C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\NACA_Coordinates\\Warehouse'
+    base_directory = directory_get()
+
+    directory = f'{base_directory}WINGS\\NACA_Coordinates\\Warehouse'
 
     if not os.path.exists(directory):
 
@@ -69,7 +86,9 @@ def interpolate_spline(points_df, x):
 
 def new_tin_path(factor_mult, name):
 
-    newdirectory = f'C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\Mesh_ICEM\\{name}\\{factor_mult}\\'
+    base_directory = directory_get()
+
+    newdirectory = f'{base_directory}\\WINGS\\Mesh_ICEM\\{name}\\{factor_mult}\\'
 
     if not os.path.exists(newdirectory):
 
@@ -167,7 +186,7 @@ def clean_array(raw_array):
     return x,y
 
 
-def coordinates_points(path):
+def updown_points(path):
 
     file = open(path, 'r')
 
@@ -218,6 +237,121 @@ def coordinates_points(path):
                               'x_up': up_x,
                               'y_up': up_y})
 
+    return points_df
+
+
+def edges(path):
+
+    points_df = updown_points(path)
+
+    interp_x = {}
+
+    interp_y_up = {}
+    interp_y_down = {}
+    x_coord = {}
+    i = 0
+
+    num = 240
+
+    for x in np.arange(0, 1, 1 / num):
+
+        interp_y_up[i], interp_y_down[i] = interpolate_spline(points_df, x)
+        interp_x[i] = x
+        x_coord[i] = x
+
+        i = i + 1
+
+    coordinates_df = pd.DataFrame({'y_up': interp_y_up,
+                                   'y_down': interp_y_down,
+                                   'x': x_coord})
+
+
+    return coordinates_df
+
+
+
+def create_replay(path, factor_mult, name):
+
+    csv = edges(path)
+
+    base_directory = directory_get()
+
+    ICEM_read = open(f'{base_directory}WINGS\\Mesh_ICEM\\Default\\Replay.txt', 'r')
+    ICEM_geom = ICEM_read.read()
+    ICEM_read.close()
+
+    k= 0
+
+    for i in range(22):
+
+        old_32_33_up = str(f'ic_hex_split_edge 32 33 {i} X_32_33_up Y_32_33_up 0')
+
+        num = 22-i
+
+        y_up = csv.iloc[num].loc['y_up'] * factor_mult
+        x = csv.iloc[num].loc['x'] * factor_mult
+
+        y_up = str(decimal.Decimal(y_up.item(0)))
+        x = str(decimal.Decimal(x.item(0)))
+
+        new_32_33_up = str(f'ic_hex_split_edge 32 33 0 {x} {y_up} 0')
+
+        ICEM_geom = ICEM_geom.replace(old_32_33_up, new_32_33_up)
+
+        k += 1
+
+
+    k_up = 0
+    k_down = 0
+
+    for i in range(22):
+
+        old_32_33_down = str(f'ic_hex_split_edge 32 33 {i} X_32_33_down Y_32_33_down 0')
+
+        y_down = csv.iloc[i].loc['y_down'] * factor_mult
+        x = csv.iloc[i].loc['x'] * factor_mult
+
+        y_down = str(decimal.Decimal(y_down.item(0)))
+        x = str(decimal.Decimal(x.item(0)))
+
+        new_32_33_down = str(f'ic_hex_split_edge 32 33 0 {x} {y_down} 0')
+
+        ICEM_geom = ICEM_geom.replace(old_32_33_down, new_32_33_down)
+
+        k +=1
+
+    for i in range(44, 230):
+
+        old_33_35 = str(f'ic_hex_split_edge 33 35 {k_up} X_33_35 Y_33_35 0')
+        old_32_34 = str(f'ic_hex_split_edge 32 34 {k_down} X_32_34 Y_32_34 0')
+
+        y_up = csv.iloc[i].loc['y_up'] * factor_mult
+        y_down = csv.iloc[i].loc['y_down'] * factor_mult
+        x = csv.iloc[i].loc['x'] * factor_mult
+
+        y_up = str(decimal.Decimal(y_up.item(0)))
+        y_down = str(decimal.Decimal(y_down.item(0)))
+        x = str(decimal.Decimal(x.item(0)))
+
+        new_33_35 = str(f'ic_hex_split_edge 33 35 {k_up} {x} {y_up} 0')
+        new_32_34 = str(f'ic_hex_split_edge 32 34 {k_down} {x} {y_down} 0')
+
+        k_up += 1
+        k_down += 1
+
+        ICEM_geom = ICEM_geom.replace(old_33_35, new_33_35)
+        ICEM_geom = ICEM_geom.replace(old_32_34, new_32_34)
+
+
+
+    rpl_file = open(f'{base_directory}WINGS\\Mesh_ICEM\\{name}\\{factor_mult}\\{name}.rpl', 'w')
+    rpl_file.write(ICEM_geom)
+    rpl_file.close()
+
+
+def coordinates_points(path):
+
+    points_df = updown_points(path)
     interp_x = {}
 
     interp_y_up = {}
@@ -246,7 +380,9 @@ def create_project(coordinates_multip, factor_mult, name):
 
     csv = coordinates_multip
 
-    ICEM_read = open('C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\Mesh_ICEM\\Default\\Project File.txt', 'r')
+    base_directory = directory_get()
+
+    ICEM_read = open(f'{base_directory}WINGS\\Mesh_ICEM\\Default\\Project File.txt', 'r')
     ICEM_geom = ICEM_read.read()
     ICEM_read.close()
 
@@ -255,7 +391,7 @@ def create_project(coordinates_multip, factor_mult, name):
     ICEM_geom = ICEM_geom.replace(old, name)
 
 
-    prj_file = open(f'C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\Mesh_ICEM\\{name}\\{factor_mult}\\{name}.prj', 'w')
+    prj_file = open(f'{base_directory}WINGS\\Mesh_ICEM\\{name}\\{factor_mult}\\{name}.prj', 'w')
     prj_file.write(ICEM_geom)
     prj_file.close()
 
@@ -264,7 +400,9 @@ def create_tin(coordinates_multip, factor_mult, name):
 
     csv = coordinates_multip
 
-    ICEM_read = open('C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\Mesh_ICEM\\Default\\Geometry.txt', 'r')
+    base_directory = directory_get()
+
+    ICEM_read = open(f'{base_directory}WINGS\\Mesh_ICEM\\Default\\Geometry.txt', 'r')
     ICEM_geom = ICEM_read.read()
     ICEM_read.close()
 
@@ -304,7 +442,7 @@ def create_tin(coordinates_multip, factor_mult, name):
     ICEM_geom = ICEM_geom.replace(old_x, last_x)
     ICEM_geom = ICEM_geom.replace(old_y, last_y)
 
-    tin_file = open(f'C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\Mesh_ICEM\\{name}\\{factor_mult}\\{name}.tin', 'w')
+    tin_file = open(f'{base_directory}WINGS\\Mesh_ICEM\\{name}\\{factor_mult}\\{name}.tin', 'w')
     tin_file.write(ICEM_geom)
     tin_file.close()
 
@@ -323,7 +461,9 @@ def wing_multip(wing_path, factor_mult):
 
 def directories_loop(factor_mult, newdirectory):
 
-    wing_directory = 'C:\\Users\\Diogo Sá\\Desktop\\perkier tech\\Drones\\WINGS\\NACA_Coordinates\\Warehouse\\'
+    base_directory = directory_get()
+
+    wing_directory = f'{base_directory}WINGS\\NACA_Coordinates\\Warehouse\\'
 
     directory = os.fsencode(wing_directory)
 
@@ -375,6 +515,8 @@ def directories_loop(factor_mult, newdirectory):
 
              new_tin_path(factor_mult, txt_name[i])
 
+             create_replay(name[i], factor_mult, txt_name[i])
+
              create_tin(cool_df[i], factor_mult, txt_name[i])
 
              create_project(cool_df[i], factor_mult, txt_name[i])
@@ -405,7 +547,6 @@ def main():
 
     print()
     input('Press any key to exit, my work is done!')
-
 
 if __name__ == "__main__":
 
