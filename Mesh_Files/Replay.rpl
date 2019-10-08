@@ -1,0 +1,552 @@
+ic_set_global geo_cad 0.00001 toler
+ic_curve point GEOM crv.00 {pnt.04 pnt.05 pnt.06 pnt.07 pnt.08 pnt.09 pnt.10 pnt.11 pnt.12 pnt.13 pnt.14 pnt.15 pnt.16 pnt.17 pnt.18 pnt.19 pnt.20 pnt.21 pnt.22 pnt.23 pnt.24 pnt.25 pnt.26 pnt.27 pnt.28 pnt.29 pnt.30 pnt.31 pnt.32 pnt.33 pnt.34 pnt.35 pnt.36 pnt.37}
+ic_curve point GEOM crv.01 {pnt.42 pnt.43 pnt.44 pnt.45 pnt.46 pnt.47 pnt.48 pnt.49 pnt.50 pnt.51 pnt.52 pnt.53 pnt.54 pnt.55 pnt.56 pnt.57 pnt.58 pnt.59 pnt.60 pnt.61 pnt.62 pnt.63 pnt.64 pnt.65 pnt.66 pnt.67 pnt.68 pnt.69 pnt.70 pnt.71 pnt.72 pnt.73 pnt.74 pnt.75}
+ic_curve point GEOM crv.02 {pnt.04 pnt.03 pnt.02 pnt.01 pnt.00 pnt.38 pnt.39 pnt.40 pnt.41 pnt.42}
+ic_geo_set_part curve crv.00 DOWN_WING 0
+ic_delete_empty_parts
+ic_geo_set_part curve crv.01 UP_WING 0
+ic_delete_empty_parts
+ic_geo_set_part curve crv.02 FRONT_WING 0
+ic_delete_empty_parts
+ic_curve arc GEOM crv.03 {pnt.75 pnt.76 pnt.37}
+ic_geo_set_part curve crv.03 BACK_WING 0
+ic_point {} GEOM pnt.77 -15000,0,0
+ic_point {} GEOM pnt.78 0,-15000,0
+ic_point {} GEOM pnt.79 0,15000,0
+ic_point {} GEOM pnt.80 15000,15000,0
+ic_point {} GEOM pnt.81 15000,-15000,0
+ic_curve arc GEOM crv.04 {pnt.79 pnt.77 pnt.78}
+ic_geo_set_part curve crv.04 INLET_1 0
+ic_curve point GEOM crv.05 {pnt.79 pnt.80}
+ic_geo_set_part curve crv.05 INLET_2 0
+ic_curve point GEOM crv.06 {pnt.78 pnt.81}
+ic_geo_set_part curve crv.06 INLET_3 0
+ic_curve point GEOM crv.07 {pnt.80 pnt.81}
+ic_geo_set_part curve crv.07 OUTLET 0
+ic_set_global geo_cad 2e+001 toler
+ic_geo_new_family FLUID
+ic_boco_set_part_color FLUID
+ic_surface 2-4crvs FLUID srf.00 {0.01 {crv.05 crv.07 crv.04 crv.06}}
+ic_set_dormant_pickable point 0 {}
+ic_set_dormant_pickable curve 0 {}
+ic_hex_unload_blocking 
+ic_hex_initialize_mesh 2d new_numbering new_blocking FLUID
+ic_hex_unblank_blocks 
+ic_hex_multi_grid_level 0
+ic_hex_projection_limit 0
+ic_hex_default_bunching_law default 2.0
+ic_hex_floating_grid off
+ic_hex_transfinite_degree 1
+ic_hex_unstruct_face_type one_tri
+ic_hex_set_unstruct_face_method uniform_quad
+ic_hex_set_n_tetra_smoothing_steps 20
+ic_hex_error_messages off_minor
+ic_hex_find_comp_curve crv.07
+ic_hex_set_edge_projection 19 21 0 1 crv.07
+ic_hex_project_to_surface 19 21
+ic_hex_find_comp_curve crv.06
+ic_hex_find_comp_curve crv.04
+ic_hex_find_comp_curve crv.05
+ic_hex_create_composite {crv.06 crv.04 crv.05}
+ic_hex_set_edge_projection 13 21 0 1 crv.06
+ic_hex_project_to_surface 13 21
+ic_hex_set_edge_projection 11 13 0 1 crv.06
+ic_hex_project_to_surface 11 13
+ic_hex_set_edge_projection 11 19 0 1 crv.06
+ic_hex_project_to_surface 11 19
+ic_hex_split_edge 11 13 0 -14999.6 70.7782 0
+ic_hex_make_edge_curve_type 11 13 spline
+ic_hex_split_edge 13 21 0 -10162.3 11032.7 0
+ic_hex_split_edge 13 21 1 -9515.26 11595.3 0
+ic_hex_split_edge 13 21 2 -8470.3 12379.2 0
+ic_hex_split_edge 13 21 3 -7470.28 13007.1 0
+ic_hex_split_edge 13 21 4 -6325.99 13600.5 0
+ic_hex_split_edge 13 21 5 -5311.42 14027.9 0
+ic_hex_split_edge 13 21 6 -4078.16 14434.7 0
+ic_hex_split_edge 13 21 7 -2884.88 14719.9 0
+ic_hex_split_edge 13 21 8 -1785.77 14893.1 0
+ic_hex_split_edge 13 21 9 -502.776 14991.6 0
+ic_hex_split_edge 11 19 0 -10197.1 -11000.7 0
+ic_hex_split_edge 11 19 1 -9579.41 -11542.5 0
+ic_hex_split_edge 11 19 2 -8932.56 -12049.9 0
+ic_hex_split_edge 11 19 3 -7880.97 -12762.8 0
+ic_hex_split_edge 11 19 4 -7361.7 -13069.1 0
+ic_hex_split_edge 11 19 5 -6388.11 -13571.7 0
+ic_hex_split_edge 11 19 6 -5762.25 -13848.8 0
+ic_hex_split_edge 11 19 7 -4790.52 -14214.3 0
+ic_hex_split_edge 11 19 8 -4261.46 -14381.7 0
+ic_hex_split_edge 11 19 9 -3412.4 -14606.6 0
+ic_hex_split_edge 11 19 10 -2440.42 -14799.9 0
+ic_hex_split_edge 11 19 11 -1674.51 -14906.2 0
+ic_hex_split_edge 11 19 12 -996.531 -14966.8 0
+ic_hex_split_edge 11 19 13 188.77 -15000 0
+ic_hex_mark_blocks unmark
+ic_hex_mark_blocks superblock 4
+ic_hex_ogrid 1 m GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID -version 50
+ic_hex_mark_blocks unmark
+ic_hex_mark_blocks unmark
+ic_hex_find_comp_curve crv.00
+ic_hex_find_comp_curve crv.01
+ic_hex_create_composite {crv.00 crv.01}
+ic_hex_set_edge_projection 33 35 0 1 crv.00
+ic_hex_project_to_surface 33 35
+ic_hex_set_edge_projection 32 33 0 1 crv.00
+ic_hex_project_to_surface 32 33
+ic_hex_set_edge_projection 32 34 0 1 crv.00
+ic_hex_project_to_surface 32 34
+ic_hex_find_comp_curve crv.02
+ic_hex_set_edge_projection 34 35 0 1 crv.02
+ic_hex_project_to_surface 34 35
+ic_hex_move_node 35 pnt.37
+ic_hex_move_node 34 pnt.75
+ic_hex_move_node 33 pnt.39
+ic_hex_move_node 32 pnt.01
+ic_hex_split_edge 33 35 0 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 1 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 2 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 3 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 4 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 5 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 6 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 7 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 8 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 9 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 10 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 11 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 12 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 13 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 14 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 15 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 16 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 17 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 18 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 19 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 20 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 21 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 22 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 23 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 24 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 25 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 26 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 27 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 28 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 29 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 30 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 31 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 32 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 33 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 34 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 35 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 36 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 37 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 38 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 39 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 40 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 41 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 42 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 43 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 44 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 45 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 46 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 47 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 48 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 49 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 50 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 51 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 52 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 53 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 54 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 55 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 56 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 57 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 58 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 59 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 60 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 61 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 62 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 63 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 64 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 65 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 66 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 67 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 68 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 69 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 70 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 71 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 72 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 73 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 74 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 75 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 76 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 77 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 78 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 79 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 80 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 81 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 82 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 83 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 84 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 85 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 86 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 87 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 88 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 89 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 90 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 91 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 92 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 93 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 94 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 95 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 96 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 97 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 98 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 99 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 100 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 101 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 102 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 103 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 104 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 105 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 106 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 107 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 108 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 109 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 110 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 111 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 112 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 113 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 114 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 115 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 116 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 117 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 118 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 119 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 120 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 121 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 122 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 123 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 124 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 125 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 126 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 127 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 128 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 129 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 130 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 131 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 132 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 133 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 134 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 135 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 136 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 137 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 138 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 139 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 140 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 141 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 142 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 143 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 144 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 145 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 146 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 147 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 148 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 149 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 150 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 151 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 152 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 153 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 154 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 155 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 156 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 157 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 158 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 159 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 160 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 161 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 162 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 163 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 164 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 165 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 166 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 167 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 168 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 169 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 170 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 171 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 172 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 173 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 174 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 175 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 176 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 177 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 178 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 179 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 180 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 181 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 182 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 183 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 184 X_33_35 Y_33_35 0
+ic_hex_split_edge 33 35 185 X_33_35 Y_33_35 0
+ic_hex_split_edge 32 34 0 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 1 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 2 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 3 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 4 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 5 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 6 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 7 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 8 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 9 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 10 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 11 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 12 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 13 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 14 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 15 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 16 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 17 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 18 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 19 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 20 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 21 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 22 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 23 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 24 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 25 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 26 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 27 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 28 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 29 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 30 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 31 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 32 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 33 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 34 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 35 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 36 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 37 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 38 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 39 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 40 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 41 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 42 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 43 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 44 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 45 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 46 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 47 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 48 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 49 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 50 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 51 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 52 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 53 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 54 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 55 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 56 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 57 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 58 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 59 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 60 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 61 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 62 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 63 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 64 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 65 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 66 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 67 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 68 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 69 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 70 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 71 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 72 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 73 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 74 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 75 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 76 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 77 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 78 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 79 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 80 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 81 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 82 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 83 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 84 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 85 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 86 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 87 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 88 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 89 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 90 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 91 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 92 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 93 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 94 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 95 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 96 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 97 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 98 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 99 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 100 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 101 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 102 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 103 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 104 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 105 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 106 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 107 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 108 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 109 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 110 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 111 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 112 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 113 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 114 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 115 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 116 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 117 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 118 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 119 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 120 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 121 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 122 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 123 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 124 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 125 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 126 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 127 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 128 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 129 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 130 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 131 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 132 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 133 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 134 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 135 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 136 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 137 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 138 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 139 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 140 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 141 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 142 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 143 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 144 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 145 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 146 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 147 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 148 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 149 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 150 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 151 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 152 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 153 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 154 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 155 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 156 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 157 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 158 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 159 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 160 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 161 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 162 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 163 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 164 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 165 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 166 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 167 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 168 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 169 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 170 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 171 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 172 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 173 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 174 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 175 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 176 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 177 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 178 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 179 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 180 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 181 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 182 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 183 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 184 X_32_34 Y_32_34 0
+ic_hex_split_edge 32 34 185 X_32_34 Y_32_34 0
+ic_hex_mark_blocks unmark
+ic_hex_mark_blocks superblock 4
+ic_hex_change_element_id VORFN
+ic_delete_empty_parts 
+ic_hex_split_edge 34 35 0 195.476 1.30382 0
+ic_hex_make_edge_curve_type 34 35 spline
+ic_hex_set_mesh 11 19 n 20_200 h1 0.0 h2 0.0 r1 2 r2 2 lmax 0 default unlocked
+ic_hex_set_mesh 19 21 n 20_200 h1 0.0 h2 0.0 r1 2 r2 2 lmax 0 default unlocked
+ic_hex_set_mesh 11 32 n 20_200 h1 0.0 h2 0.0 r1 2 r2 2 lmax 0 default unlocked
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_set_mesh 13 33 n 400_200 h1rel 0.0 h2rel 0.0 r1 2 r2 2 lmax 0 default copy_to_parallel unlocked
+ic_hex_set_mesh 13 33 n 100_200 h1rel 0.0 h2rel 3.33313334533e-006 r1 2 r2 1.1 lmax 0 default copy_to_parallel unlocked
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_set_mesh 32 34 n 150_200 h1rel 0.0 h2rel 0.0 r1 2 r2 2 lmax 0 default copy_to_parallel unlocked
+ic_hex_set_mesh 32 33 n 75_200 h1rel 0.0 h2rel 0.0 r1 2 r2 2 lmax 0 default copy_to_parallel unlocked
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_set_mesh 19 21 n 100_200 h1rel 0.0 h2rel 0.0 r1 2 r2 2 lmax 0 default copy_to_parallel unlocked
+ic_hex_set_mesh 19 21 n 100_200 h1rel 0.0 h2rel 0.0 r1 2 r2 2 lmax 0 default copy_to_parallel unlocked
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_match_edges 32 33 32 34
+ic_hex_match_edges 32 33 32 34
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_match_edges 32 33 33 35
+ic_hex_set_mesh 33 35 n 150_200 h1rel 0.00106011837327 h2rel 0.0 r1 1.1 r2 1.1 lmax 0 default copy_to_parallel unlocked
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_match_edges 34 35 32 34
+ic_hex_match_edges 34 35 33 35
+ic_hex_set_mesh 32 34 n 150_200 h1rel 0.00106011631629 h2rel 0.000150374559812 r1 1.1 r2 1.1 lmax 0 default copy_to_parallel unlocked
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_match_edges 19 21 11 19
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_match_edges 19 21 13 21
+ic_hex_match_edges 19 21 13 21
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_hex_match_edges 11 13 13 21
+ic_hex_match_edges 11 13 11 19
+ic_hex_create_mesh GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 dim_to_mesh 3
+ic_undo_group_begin 
+ic_uns_diag_reset_degen_min_max 
+ic_hex_ratio_histogram 20 GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 minval 0 -type determinant_27 maxval 1 new_format
+ic_undo_group_end 
+ic_uns_diag_reset_degen_min_max 
+ic_uns_diag_reset_degen_min_max 
+ic_uns_diag_reset_degen_min_max 
+ic_undo_group_begin 
+ic_uns_diag_reset_degen_min_max 
+ic_hex_ratio_histogram 20 GEOM DOWN_WING UP_WING BACK_WING INLET_1 INLET_2 INLET_3 OUTLET FLUID proj 2 minval 1 -type aspect_ratio maxval 20 new_format
+ic_undo_group_end 
+ic_uns_diag_reset_degen_min_max 
+ic_uns_diag_reset_degen_min_max 
+ic_uns_diag_reset_degen_min_max 
+ic_uns_diag_reset_degen_min_max 
+ic_uns_diag_reset_degen_min_max 
+ic_boco_solver {ANSYS Fluent}
+ic_solver_mesh_info {ANSYS Fluent}
+ic_boco_set GEOM {}
+ic_boco_set DOWN_WING {{1 WALL 0}}
+ic_boco_set INLET_1 {}
+ic_boco_set FLUID { { 1  {color}  12109107  } }
+ic_boco_set ORFN {}
+ic_boco_set UP_WING {{1 WALL 0}}
+ic_boco_set BACK_WING {{1 WALL 0}}
+ic_boco_set INLET_2 {}
+ic_boco_set OUTLET {{1 PRESO 0}}
+ic_boco_set INLET_3 {}
+ic_geo_new_family VORFN 0
+ic_boco_set VORFN {}
+ic_boco_set GEOM {}
+ic_boco_set DOWN_WING { { 1  {WALL}  0  } }
+ic_boco_set INLET_1 {{1 PRESI 0}}
+ic_boco_set FLUID { { 1  {color}  12109107  } }
+ic_boco_set ORFN {}
+ic_boco_set UP_WING { { 1  {WALL}  0  } }
+ic_boco_set BACK_WING { { 1  {WALL}  0  } }
+ic_boco_set INLET_2 {{1 PRESF 0}}
+ic_boco_set OUTLET { { 1  {PRESO}  0  } }
+ic_boco_set INLET_3 {{1 PRESF 0}}
