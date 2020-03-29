@@ -24,6 +24,9 @@ Python Package to:
 - Data visualization of the results (Lift and Drag);
 - Simulate flight times and distances;
 
+## Applications
+
+YYYYY
 
 ## Getting Started
 
