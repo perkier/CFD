@@ -65,19 +65,22 @@ ABC ABc
 
 
 
-# Result Analysis
+# Result Analysis - Mesh Independance
 
-Python functions to visualize the CFD results 
+Python functions to visualize where the discretization errors are contributing to different results with different mesh sizes in CFD results.
+
+The grid independence needs to be studied in order to minimize the impact of the grid size on discretization errors and computational cost. The grid size needs to be optimized to be small enough to guarantee that the results are independent of the mesh. The usual process is to increase 20-25% the mesh cells and compare the final flow results, defining an error-margin (normally 1-2%). However, there is no way to know where the difference is.
+[Mesh Independance script](https://github.com/perkier/CFD/blob/master/Result_Analysis/Mesh_Independance_Analysis.py) compares a user-defined parameter (e.g. velocity) between the denser mesh and the original mesh. Finite Volumes techniques were used to approximate the denser mesh with the original one, as the coordinates of each cell varied between the meshes.
 
 
-## XXXXX
+## Applications
 
 YYYYY
 
-### XXXXX
+## Getting Started
 YYYYYY
 
-### XXXXX
+## Main Components
 - YYYYY
 - YYYYY
 - YYYYY
