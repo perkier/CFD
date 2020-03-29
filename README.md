@@ -6,7 +6,7 @@ ANSYS Version used: ANSYS Fluent 18.0
 
 <!--ts-->
    * [Wings Aerodynamics](#wings-aerodynamics)
-   * [Result Analysis](#result-analysis-mesh-independance)
+   * [Result Analysis](#result-analysis---mesh-independance)
 
 <!--te-->
 
