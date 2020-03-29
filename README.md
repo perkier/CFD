@@ -71,7 +71,7 @@ The grid independence needs to be studied in order to minimize the impact of the
 
 ## Applications
 
-YYYYY
+![Gif of the Results](https://i.imgur.com/3T3feNc.gif)
 
 ## Getting Started
 YYYYYY
