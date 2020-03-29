@@ -6,9 +6,7 @@ ANSYS Version used: ANSYS Fluent 18.0
 
 <!--ts-->
    * [Wings Aerodynamics](#wings-aerodynamics)
-   * [Result Analysis](#aeronautics-projects)
-   * [CFD Automation](#aeronautics-projects)
-
+   * [Result Analysis](#result-analysis-mesh-independance)
 
 <!--te-->
 
