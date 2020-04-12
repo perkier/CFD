@@ -55,7 +55,7 @@ ABC ABc
 
 It gets possible to compare different angles in different speeds and interpolate the lift values:
 
-![Plot Comparing Lift with Velocity](https://imgur.com/OoMCSsn)
+![Plot Comparing Lift with Velocity](https://i.imgur.com/OoMCSsn.png)
 
 With this image it is possible to see that S1223 profile airfoil should not be operted with an angle above 3º or else it gets to unstable.
 
