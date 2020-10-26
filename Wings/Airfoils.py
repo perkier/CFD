@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, PillowWriter
 import seaborn as sns
 
 import pickle
@@ -34,6 +35,27 @@ def edit_case(case, airfoil, angle):
     case = case.replace(old_radians, new_radians)
 
     return case
+
+
+def plot_styling():
+
+    # plt.style.use('dark_background')
+
+    plt.gca().yaxis.grid(True, color='gray')
+
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] = 'Ubuntu'
+    plt.rcParams['font.monospace'] = 'Ubuntu Mono'
+    plt.rcParams['font.size'] = 15
+    plt.rcParams['axes.labelsize'] = 15
+    plt.rcParams['axes.labelweight'] = 'bold'
+    plt.rcParams['xtick.labelsize'] = 8
+    plt.rcParams['ytick.labelsize'] = 8
+    plt.rcParams['legend.fontsize'] = 15
+    plt.rcParams['figure.titlesize'] = 25
+
+    for spine in plt.gca().spines.values():
+        spine.set_visible(False)
 
 
 def edit_mesh(case, alpha_min, alpha_max, delta_alpha):
@@ -194,6 +216,26 @@ def double_Plotting(df, x_column, y_column, bar_column, fig, ax, data, title, co
     # ax[1].title('Power Consumption per Airfoil')
 
 
+def best_results(df):
+
+    unique_airfoil = df.loc[:,'Airfoil'].unique()
+
+    choosen_df = pd.DataFrame()
+
+    for airfoil in unique_airfoil:
+
+        unique_df = df.loc[df['Airfoil'] == airfoil].reset_index(drop=True)
+
+        lift_drag_df = unique_df.sort_values(by=['Lift_Drag_Ratio'], ascending=False).reset_index(drop=True).iloc[:3]
+        drag_df = unique_df.sort_values(by=['Drag_Coeff'], ascending=True).reset_index(drop=True).iloc[:1]
+        lift_df = unique_df.sort_values(by=['Lift_Coeff'], ascending=False).reset_index(drop=True).iloc[:1]
+
+        choosen_df = pd.concat([choosen_df, lift_drag_df, drag_df, lift_df], ignore_index=True).drop_duplicates().reset_index(drop=True)
+
+
+    return choosen_df
+
+
 class Mesh_Creation(object):
 
     def __init__(self):
@@ -224,7 +266,7 @@ class Mesh_Creation(object):
 
 class Journal_Creator(object):
 
-    def __init__(self, alpha_min, alpha_max, sim_num, delta_alpha=1):
+    def __init__(self, alpha_min, alpha_max, sim_num, speed, delta_alpha=1):
 
         see_all()
 
@@ -234,6 +276,7 @@ class Journal_Creator(object):
         self.alpha_max = alpha_max
         self.delta_alpha = delta_alpha
         self.sim_num = sim_num
+        self.speed = speed
 
         self.final_data_path = find_data_path()
 
@@ -277,7 +320,7 @@ class Journal_Creator(object):
         if not os.path.exists(self.cases_directory):
             os.makedirs(self.cases_directory)
 
-        self.airfoils_directory = f'{self.sim_directory}Airfoils\\'
+        self.airfoils_directory = f'{self.sim_directory}Airfoils-{self.speed}\\'
 
         if not os.path.exists(self.airfoils_directory):
             os.makedirs(self.airfoils_directory)
@@ -396,11 +439,13 @@ class Journal_Creator(object):
 
 class post_processing(object):
 
-    def __init__(self, path_df):
+    def __init__(self, path_df, speed):
 
         self.path_df = path_df
+        self.speed = speed
 
         self.posprocessing_df = pd.DataFrame({'Airfoil': [],
+                                              "Speed": [],
                                               'Angle': [],
                                               'Lift_Coeff': [],
                                               'Lift_Force': [],
@@ -408,9 +453,10 @@ class post_processing(object):
                                               'Drag_Force': [],
                                               'Iterations': [],
                                               'Std_Lift': [],
-                                              'Std_Drag': []})
+                                              'Std_Drag': [],
+                                              'Inside_Path': []})
 
-        self.check_done()
+        # self.check_done()
 
 
     def take_values(self, part, file, path):
@@ -474,6 +520,20 @@ class post_processing(object):
 
             arr = os.listdir(self.path_df.iloc[i].loc['Angles_path'])
 
+            for file in arr:
+
+                ext = file.split('.')
+
+                if len(ext) == 1:
+
+                    full_dir = f"{self.path_df.iloc[i].loc['Angles_path']}{ext[0]}"
+                    os.rename(full_dir, full_dir + "_rawDATA.txt")
+
+                else:
+                    pass
+
+            arr = os.listdir(self.path_df.iloc[i].loc['Angles_path'])
+            
             drag_coeff = 0
             lift_coeff = 0
             drag_force = 0
@@ -483,12 +543,19 @@ class post_processing(object):
             lift_std = 0
 
             iterarions = 0
-
             switch = 0
 
             for file in arr:
 
                 ext = file.split('.')
+
+                if len(ext) == 1:
+                    pass
+
+                if ext[1] == 'txt':
+
+                    full_dir = f"{self.path_df.iloc[i].loc['Angles_path']}{file}"
+                    internal_data = full_dir
 
                 if ext[1] == 'out':
 
@@ -515,7 +582,13 @@ class post_processing(object):
 
             if switch == 1:
 
+                try:
+                    internal_data  # does internal_data exist in the current namespace
+                except NameError:
+                    internal_data = "Inside Path not assigned yet"
+
                 to_append = pd.DataFrame({'Airfoil': [self.path_df.iloc[i].loc['Airfoil']],
+                                          'Speed': [self.speed],
                                           'Angle': [self.path_df.iloc[i].loc['Angle']],
                                           'Lift_Coeff': [lift_coeff],
                                           'Lift_Force': [lift_force],
@@ -523,7 +596,9 @@ class post_processing(object):
                                           'Drag_Force': [drag_force],
                                           'Iterations': [iterations],
                                           'Std_Lift': [lift_std],
-                                          'Std_Drag': [drag_std]})
+                                          'Std_Drag': [drag_std],
+                                          'Root_Path': [self.path_df.iloc[i].loc['Angles_path']],
+                                          'Inside_Path': [internal_data]})
 
                 self.posprocessing_df = pd.concat([self.posprocessing_df, to_append], ignore_index=True)
 
@@ -533,6 +608,9 @@ class post_processing(object):
 
         self.posprocessing_df['Lift_Drag_Ratio'] = self.posprocessing_df['Lift_Coeff'] / self.posprocessing_df['Drag_Coeff']
 
+    def ready_results(self, df):
+
+        self.posprocessing_df = df
 
     def plotting(self):
 
@@ -545,7 +623,10 @@ class post_processing(object):
 
         self.unique_aifoils = self.posprocessing_df.loc[:, 'Airfoil'].unique()
 
-        color_pallete = ['turquoise', 'springgreen', 'khaki', 'violet', 'deepskyblue', 'violet', 'peru','c', 'lime', 'darkkhaki', 'palevioletred', 'deepskyblue', 'violet', 'peru']
+        color_pallete = ['turquoise', 'springgreen', 'khaki', 'violet', 'deepskyblue', 'violet', 'peru','c', 'lime', 'darkkhaki', 'palevioletred', 'deepskyblue', 'violet', 'peru',
+                         'turquoise', 'springgreen', 'khaki', 'violet', 'deepskyblue', 'violet', 'peru','c', 'lime', 'darkkhaki', 'palevioletred', 'deepskyblue', 'violet', 'peru',
+                         'turquoise', 'springgreen', 'khaki', 'violet', 'deepskyblue', 'violet', 'peru','c', 'lime', 'darkkhaki', 'palevioletred', 'deepskyblue', 'violet', 'peru',
+                         'turquoise', 'springgreen', 'khaki', 'violet', 'deepskyblue', 'violet', 'peru','c', 'lime', 'darkkhaki', 'palevioletred', 'deepskyblue', 'violet', 'peru']
 
         j = 0
         fig, ax = plt.subplots(figsize=(30, 15))
@@ -571,6 +652,7 @@ class post_processing(object):
 
 
 
+
 class flight_simulator(object):
 
     def __init__(self, postprocessing_df):
@@ -586,6 +668,316 @@ class flight_simulator(object):
         self.g = 9.81
 
         self.df = postprocessing_df.loc[postprocessing_df['Std_Lift'] < 1].loc[postprocessing_df['Std_Drag'] < 1].reset_index(drop=True)
+
+    def flow_plotting(self):
+
+        Parameter = "total-pressure"
+        # Parameter = "mach-number"
+
+        import imageio
+        from array2gif import write_gif
+        import io
+        from PIL import Image
+
+        ims = []
+        imgs = []
+
+        # angles = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+        airfoil = self.df.iloc[0].loc["Airfoil"]
+        velocity = self.df.iloc[0].loc["Speed"]
+
+        df = self.df.loc[self.df["Airfoil"] == airfoil].loc[self.df["Speed"] == velocity].reset_index(drop=True)
+
+        angles = df.loc[:,"Angle"].unique()
+
+        Title = f"{airfoil} CFD study for {Parameter} and Lift/Drag for Re = "
+
+        # for i in angles:
+        for i in range(len(df)):
+
+            # csv_reader = open(self.df.iloc[i].loc["Inside_Path"], 'rb')
+            csv_reader = open(df.iloc[i].loc["Inside_Path"], 'rb')
+            csv_read = pd.read_csv(csv_reader, encoding='utf-8', delimiter=',', skipinitialspace=True)
+            csv_reader.close()
+
+            plotting_array = np.array(csv_read.loc[:,["x-coordinate", "y-coordinate", Parameter]])
+
+            real_x = np.array(csv_read.loc[:,"x-coordinate"])
+            real_y = np.array(csv_read.loc[:, "y-coordinate"])
+            real_z = np.array(csv_read.loc[:, Parameter])
+
+            # Set up the axes with gridspec
+            fig = plt.figure(figsize=(16, 16))
+
+            plt.title(Title)
+
+            plot_styling()
+
+            # grid = plt.GridSpec(28, 14, hspace=0.2, wspace=0.2)
+            # main_ax = fig.add_subplot(grid[:14, :-1])
+            # ax_right = fig.add_subplot(grid[14:, :-1], xticklabels=[], yticklabels=[])
+
+            grid = plt.GridSpec(14, 21, hspace=0.2, wspace=0.2)
+
+            main_ax = fig.add_subplot(grid[:14, :13])
+            ax_right = fig.add_subplot(grid[:7, 13:], xticklabels=[], yticklabels=[])
+            ax_right_2 = fig.add_subplot(grid[7:14, 13:], xticklabels=[], yticklabels=[])
+
+            # main_ax = fig.add_subplot(grid[:-1, 1:])
+            # x_hist = fig.add_subplot(grid[-1, 1:], yticklabels=[], sharex=main_ax)
+            # ax_right = fig.add_subplot(grid[:-1, -1], sharex=main_ax, yticklabels=[])
+
+            main_ax.set_facecolor('black')
+
+            # scatter points on the main axes
+
+            main_ax.scatter(real_x, real_y, c=real_z,
+                            cmap='jet', alpha=1, s=1)
+
+            # cmap = main_ax.get_cmap()
+
+            # main_ax.set_ylim(-0.1, 0.1)
+            main_ax.set_ylim(-0.05, 0.05)
+            main_ax.set_xlim(-0.05, 0.15)
+
+            main_ax.set_title(f'CFD Results of {Parameter}')
+
+
+            # Plot Secondary Plot
+
+
+            # ax_right.suptitle(title, fontsize=12)
+
+            ax_right.set_xlabel(f'Angle of Attack')
+            ax_right.set_title('Lift And Drag Coefficients')
+
+            # color_pallete = ['turquoise', 'springgreen', 'khaki', 'violet', 'deepskyblue', 'violet', 'peru', 'c',
+            #                  'lime',
+
+            ax_right.plot(df["Angle"], df["Drag_Coeff"], '-o', color="lime", linewidth=2.5)
+            ax_right.plot(df["Angle"], df["Lift_Coeff"], '-o', color="violet", linewidth=2.5)
+
+            ax_right_2.plot(df["Angle"], df["Lift_Drag_Ratio"], '-o', color="deepskyblue", linewidth=2.5)
+
+            # ax_right.annotate(f'Angle in figure', xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
+            #                   xytext=(df.iloc[i].loc["Angle"], 10), textcoords='data',
+            #                   arrowprops=dict(facecolor='black', shrink=0.05),
+            #                   horizontalalignment='right', verticalalignment='top',
+            #                   )
+
+            # ax_right.annotate(f'Angle in figure', (df.iloc[i].loc["Angle"], 10))
+            #
+
+            if df.iloc[i].loc["Lift_Drag_Ratio"] > 10:
+
+                ax_right_2.annotate("",
+                                  xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
+                                  xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]-5), textcoords='data',
+                                  arrowprops=dict(fc="cyan" ,arrowstyle="->", connectionstyle="arc3"),
+                                  )
+
+            else:
+
+                ax_right_2.annotate("",
+                                    xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
+                                    xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"] + 5),
+                                    textcoords='data',
+                                    arrowprops=dict(fc="cyan", arrowstyle="->", connectionstyle="arc3"),
+                                    )
+
+            # ax_right.annotate("",
+            #                   xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Coeff"]), xycoords='data',
+            #                   xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Coeff"]-0.2), textcoords='data',
+            #                   arrowprops=dict(fc="cyan", arrowstyle="->", connectionstyle="arc3"),
+            #                   )
+
+            ax_right.annotate("",
+                              xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Drag_Coeff"]), xycoords='data',
+                              xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Coeff"]), textcoords='data',
+                              arrowprops=dict(fc="cyan", arrowstyle="<->", connectionstyle="arc3"),
+                              )
+
+            ax_right.legend()
+
+            # ax_right.scatter(x=df[x_column], y=df[y_column], linestyle='--', marker='o', s=100, label=data_name, color=color)
+
+            # # Add a table at the right of the axes
+            #
+            # cell_text = []
+            #
+            # data = df.loc[:,["Lift_Coeff", "Drag_Coeff", "Lift_Drag_Ratio"]].to_numpy()
+            # columns = ("Lift_Coeff", "Drag_Coeff", "Lift_Drag_Ratio")
+            # rows = angles
+            #
+            # for row in data:
+            #     cell_text.append([f'{x / 1000:1.1f}' for x in row])
+            #
+            # the_table = ax_right.table(cellText=cell_text,
+            #                            rowLabels=rows,
+            #                            # rowColours=colors,
+            #                            colLabels=columns,
+            #                            colWidths=[0.1, 0.1, 0.1],
+            #                            loc='center')
+
+            # leg = ax.legend()
+            # leg.set_title(title, prop={'size': 22})
+            #
+            # ax.legend(fontsize=30, markerscale=1., scatterpoints=5, prop={'size': 30})
+
+            io_buf = io.BytesIO()
+            fig.savefig(io_buf, format='png', dpi=300, quality=100,  )
+            # fig.imsave(io_buf, arr="MxNx3" , format='png', dpi=300)
+
+            ims.append(np.array(io_buf))
+
+            new_frame = Image.open(io_buf)
+            imgs.append(new_frame)
+
+
+
+            # io_buf.close()
+
+            plt.clf()
+
+        # imageio.mimsave('D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\gifs\\movie.gif', ims, duration = 0.5, fps=55)
+        # write_gif(ims, 'D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\gifs\\movie.gif', fps=55)
+
+        imgs[0].save(f'D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\gifs\\{airfoil}_{Parameter}.gif', format='GIF',
+                    append_images = imgs[1:],
+                    save_all = True,
+                    duration = 300, loop = 0)
+
+        quit()
+
+
+    def art_plotting(self):
+
+        # Parameter = "total-pressure"
+        # Parameter = "mach-number"
+
+        import imageio
+        from array2gif import write_gif
+        import io
+        from PIL import Image
+
+        ims = []
+        imgs = []
+
+        # angles = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+        airfoil = self.df.iloc[0].loc["Airfoil"]
+        velocity = self.df.iloc[0].loc["Speed"]
+        df = self.df.loc[self.df["Airfoil"] == airfoil].loc[self.df["Speed"] == velocity].reset_index(drop=True)
+
+
+        airfoil_2 = self.df.iloc[1].loc["Airfoil"]
+        velocity_2 = self.df.iloc[1].loc["Speed"]
+        df_2 = self.df.loc[self.df["Airfoil"] == airfoil_2].loc[self.df["Speed"] == velocity_2].reset_index(drop=True)
+
+        airfoil_3 = self.df.iloc[2].loc["Airfoil"]
+        velocity_3 = self.df.iloc[0].loc["Speed"]
+        df_3 = self.df.loc[self.df["Airfoil"] == airfoil_3].loc[self.df["Speed"] == velocity_3].reset_index(drop=True)
+
+
+        angles = df.loc[:,"Angle"].unique()
+
+
+        for i in range(len(df)):
+
+            csv_reader = open(df.iloc[i].loc["Inside_Path"], 'rb')
+            csv_read = pd.read_csv(csv_reader, encoding='utf-8', delimiter=',', skipinitialspace=True)
+            csv_reader.close()
+
+            real_x = np.array(csv_read.loc[:,"x-coordinate"])
+            real_y = np.array(csv_read.loc[:, "y-coordinate"])
+
+            # Set up the axes with gridspec
+            fig = plt.figure(figsize=(16, 16))
+
+            # plt.title(Title)
+
+            plot_styling()
+
+            grid = plt.GridSpec(21, 21, hspace=0.2, wspace=0.2)
+
+            main_ax = fig.add_subplot()
+
+            # main_ax = fig.add_subplot(grid[:-1, 1:])
+            # x_hist = fig.add_subplot(grid[-1, 1:], yticklabels=[], sharex=main_ax)
+            # ax_right = fig.add_subplot(grid[:-1, -1], sharex=main_ax, yticklabels=[])
+
+            main_ax.set_facecolor('black')
+
+            # scatter points on the main axes
+
+            main_ax.scatter(real_x, real_y, c="hotpink",
+                            cmap='jet', alpha=0.5, s=1)
+
+
+            csv_reader = open(df_2.iloc[int(i - i/2)].loc["Inside_Path"], 'rb')
+            csv_read = pd.read_csv(csv_reader, encoding='utf-8', delimiter=',', skipinitialspace=True)
+            csv_reader.close()
+
+            real_x = np.array(csv_read.loc[:,"x-coordinate"])
+            real_y = np.array(csv_read.loc[:, "y-coordinate"])
+
+            real_y2 = np.flip(real_y)
+
+            real_y3 = real_y[::-1]
+            real_x3 = real_x[::-1]
+
+            main_ax.scatter(real_x, real_y, c="cyan",
+                            alpha=1, s=1)
+
+            csv_reader = open(df_3.iloc[int(i - i / 3)].loc["Inside_Path"], 'rb')
+            csv_read = pd.read_csv(csv_reader, encoding='utf-8', delimiter=',', skipinitialspace=True)
+            csv_reader.close()
+
+            colors = ["pink", "lightpink", "lavenderblush", "palevioletred", "pink", "lightpink", "lavenderblush", "palevioletred", "pink", "lightpink", "lavenderblush", "palevioletred"]
+
+
+            real_x = (np.array(csv_read.loc[:, "x-coordinate"]) + np.full(len(csv_read), -0.01*i)) * 3
+            real_y = (np.array(csv_read.loc[:, "y-coordinate"]) + np.full(len(csv_read), +0.01*i)) * 2
+
+            main_ax.scatter(real_x, real_y, c=colors[i],
+                            alpha=0.2, s=1)
+
+            if i%2 == 0:
+                main_ax.scatter(real_x3, real_y3, c="teal", alpha=0.2, s=5)
+
+            main_ax.scatter(real_x, real_y2, c="darkorchid",
+                            alpha=0.4, s=10)
+
+            main_ax.set_ylim(-0.05, 0.05)
+            main_ax.set_xlim(-0.05, 0.15)
+
+            io_buf = io.BytesIO()
+            fig.savefig(io_buf, format='png', dpi=300, quality=100,  )
+            # fig.imsave(io_buf, arr="MxNx3" , format='png', dpi=300)
+
+            ims.append(np.array(io_buf))
+
+            new_frame = Image.open(io_buf)
+            imgs.append(new_frame)
+
+
+
+            # io_buf.close()
+
+            plt.clf()
+
+        # imageio.mimsave('D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\gifs\\movie.gif', ims, duration = 0.5, fps=55)
+        # write_gif(ims, 'D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\gifs\\movie.gif', fps=55)
+
+        imgs[0].save(f'D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\gifs\\ARTSY.gif', format='GIF',
+                    append_images = imgs[1:],
+                    save_all = True,
+                    duration = 300, loop = 0)
+
+        quit()
+
+
 
 
     def const_speed(self):
@@ -604,6 +996,8 @@ class flight_simulator(object):
             Thrust = Drag
             Power = Thrust * self.init_v
 
+            falling_angle = 0
+
             h = self.init_h
             dist = 0
 
@@ -620,8 +1014,12 @@ class flight_simulator(object):
 
                 safety_breack += 1
 
-                h -= Lift / (self.mass * self.g)
-                dist += self.init_v
+                Delta_h = Lift / (self.mass * self.g)
+                h -= Delta_h
+
+                falling_angle = math.asin(Delta_h / self.init_v)
+
+                dist += self.init_v * math.cos(falling_angle)
 
                 to_append = pd.DataFrame({'Airfoil': [airfoil_name],
                                           'Angle': [self.df.iloc[i].loc['Angle']],
@@ -665,12 +1063,14 @@ class flight_simulator(object):
 
             cL_cD = unique_df.iloc[0].loc['cL/cD']
 
-            if cL_cD >= 40:
+            double_Plotting(unique_df, 'Distance', 'Height', 'Power', fig, axs, airfoil, title, color_pallete[j])
 
-                double_Plotting(unique_df, 'Distance', 'Height', 'Power',fig, axs, airfoil, title, color_pallete[j])
-
-            else:
-                pass
+            # if cL_cD >= 40:
+            #
+            #     double_Plotting(unique_df, 'Distance', 'Height', 'Power',fig, axs, airfoil, title, color_pallete[j])
+            #
+            # else:
+            #     pass
 
             j += 1
 
@@ -688,6 +1088,7 @@ class flight_simulator(object):
 
         self.df['Drag_Force'] = self.df['Drag_Coeff'].apply(lambda x: x*divided_by)
 
+
     def lift_force(self):
 
         self.df = self.df.drop(['Lift_Force'], axis=1)
@@ -697,27 +1098,83 @@ class flight_simulator(object):
         self.df['Lift_Force'] = self.df['Lift_Coeff'].apply(lambda x: x * divided_by)
 
 
-def main():
+def create_results(speed):
 
-    joujou = Journal_Creator(-10, 6, 1, 1)
+    joujou = Journal_Creator(-10, 6, 1, speed, 1)
     path_df = joujou.create_dirs()
 
+    # # journal.read_template_journals()
+    # joujou.edit_journals()
 
-    # journal.read_template_journals()
-    joujou.edit_journals()
-
-    posproc = post_processing(path_df)
+    posproc = post_processing(path_df, speed)
+    posproc.check_done()
     posproc.plotting()
 
     results_df = posproc.posprocessing_df
 
-    print('\n'*10)
+    results_df.to_csv(f'D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\out\\{speed}.csv', index=False)
 
-    sim = flight_simulator(results_df)
+    return results_df, posproc
+
+
+def read_results(speed):
+
+    csv_reader = open(f'D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\out\\{speed}.csv', 'rb')
+    df = pd.read_csv(csv_reader, encoding='utf-8', delimiter=',')
+    csv_reader.close()
+
+    return df
+
+
+def main():
+
+    speed_array = [11, 16, 22, 27, 30, 33, 36, 5, 8]
+
+    results_df = {}
+
+    # for speed in speed_array:
+    #
+    #     joujou = Journal_Creator(-10, 6, 1, speed, 1)
+    #     path_df = joujou.create_dirs()
+    #
+    #     # # # journal.read_template_journals()
+    #     # # joujou.edit_journals()
+    #
+    #     # results_df[speed] = create_results(speed)
+    #
+    #     posproc = post_processing(path_df, speed)
+    #
+    #     results_df[speed] = read_results(speed)
+    #     posproc.ready_results(results_df[speed])
+    #
+    #     # posproc.flow_plotting()
+    #
+    # pickle.dump(results_df, open("D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\Pickles\\results.p", "wb"))
+
+    results_df = pickle.load( open("D:\\Diogo\\Simulations\\Airfoil_Simulation_1\\Pickles\\results.p", "rb" ) )
+
+    # print(results_df)
+
+    grouped_df = pd.DataFrame()
+
+    for speed in results_df:
+
+        grouped_df = pd.concat([grouped_df, results_df[speed]], axis=0, sort=False).sort_values(by=['Airfoil', 'Speed', 'Angle'], ascending=True).reset_index(drop=True)
+
+    print(grouped_df.head())
+    print(grouped_df.tail())
+
+    results_test = best_results(grouped_df)
+
+    sim = flight_simulator(grouped_df.loc[grouped_df["Airfoil"] == "EPPLER 58 AIRFOIL"])
+
+    sim.art_plotting()
+
+    sim.flow_plotting()
     sim.const_speed()
 
-    pickle.dump(sim, open("C:\\Users\\diogo\\Desktop\\inegi\\Simulations\\Airfoil_Simulation_1\\Plots\\pickle_rick.p", "wb"))
-    # sim = pickle.load( open("C:\\Users\\diogo\\Desktop\\inegi\\Simulations\\Airfoil_Simulation_1\\Plots\\pickle_rick.p", "rb" ) )
+    # pickle.dump(sim, open("C:\\Users\\diogo\\Desktop\\perkier tech\\Drones\\Simulations\\Airfoil_Simulation_1\\Plots\\pickle_rick.p", "wb"))
+    # sim = pickle.load( open("C:\\Users\\diogo\\Desktop\\perkier tech\\Drones\\Simulations\\Airfoil_Simulation_1\\Plots\\pickle_rick.p", "rb" ) )
 
     sim.plotting_cte_speed()
 
