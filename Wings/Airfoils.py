@@ -693,11 +693,22 @@ class flight_simulator(object):
 
         Title = f"{airfoil} CFD study for {Parameter} and Lift/Drag for Re = "
 
-        # for i in angles:
-        for i in range(len(df)):
+        angles = np.append(angles, np.flip(angles[1:len(angles)-1]))
+        i = 0
+
+        # for i in range(len(df)):
+        for angle in angles:
 
             # csv_reader = open(self.df.iloc[i].loc["Inside_Path"], 'rb')
-            csv_reader = open(df.iloc[i].loc["Inside_Path"], 'rb')
+
+            path = df.loc[df["Angle"] == angle].iloc[0].loc["Inside_Path"]
+            lift_drag_ratio = df.loc[df["Angle"] == angle].iloc[0].loc["Lift_Drag_Ratio"]
+            drag_coeff = df.loc[df["Angle"] == angle].iloc[0].loc["Drag_Coeff"]
+            lift_coeff = df.loc[df["Angle"] == angle].iloc[0].loc["Lift_Coeff"]
+
+            # csv_reader = open(df.iloc[i].loc["Inside_Path"], 'rb')
+            csv_reader = open(path, 'rb')
+
             csv_read = pd.read_csv(csv_reader, encoding='utf-8', delimiter=',', skipinitialspace=True)
             csv_reader.close()
 
@@ -708,11 +719,21 @@ class flight_simulator(object):
             real_z = np.array(csv_read.loc[:, Parameter])
 
             # Set up the axes with gridspec
-            fig = plt.figure(figsize=(16, 16))
+            fig = plt.figure(figsize=(20, 16))
 
-            plt.title(Title)
+            # plt.title(Title)
 
-            plot_styling()
+            # plot_styling()
+
+            plt.rcParams['font.family'] = 'serif'
+            plt.rcParams['font.serif'] = 'Ubuntu'
+            plt.rcParams['font.monospace'] = 'Ubuntu Mono'
+            plt.rcParams['font.size'] = 12
+            plt.rcParams['axes.labelsize'] = 12
+            plt.rcParams['xtick.labelsize'] = 10
+            plt.rcParams['ytick.labelsize'] = 10
+            plt.rcParams['legend.fontsize'] = 12
+            plt.rcParams['figure.titlesize'] = 30
 
             # grid = plt.GridSpec(28, 14, hspace=0.2, wspace=0.2)
             # main_ax = fig.add_subplot(grid[:14, :-1])
@@ -721,8 +742,8 @@ class flight_simulator(object):
             grid = plt.GridSpec(14, 21, hspace=0.2, wspace=0.2)
 
             main_ax = fig.add_subplot(grid[:14, :13])
-            ax_right = fig.add_subplot(grid[:7, 13:], xticklabels=[], yticklabels=[])
-            ax_right_2 = fig.add_subplot(grid[7:14, 13:], xticklabels=[], yticklabels=[])
+            ax_right = fig.add_subplot(grid[:7, 13:])
+            ax_right_2 = fig.add_subplot(grid[7:14, 13:])
 
             # main_ax = fig.add_subplot(grid[:-1, 1:])
             # x_hist = fig.add_subplot(grid[-1, 1:], yticklabels=[], sharex=main_ax)
@@ -732,73 +753,82 @@ class flight_simulator(object):
 
             # scatter points on the main axes
 
-            main_ax.scatter(real_x, real_y, c=real_z,
-                            cmap='jet', alpha=1, s=1)
+            sc = main_ax.scatter(real_x, real_y, c=real_z,
+                                 cmap='jet', alpha=1, s=1)
 
             # cmap = main_ax.get_cmap()
 
             # main_ax.set_ylim(-0.1, 0.1)
             main_ax.set_ylim(-0.05, 0.05)
-            main_ax.set_xlim(-0.05, 0.15)
+            main_ax.set_xlim(-0.05, 0.14)
+
+            from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+            # COLORBAR
+            cbaxes = inset_axes(main_ax, width="40%", height="3%", bbox_to_anchor=[0, 0.15, 1, 1], loc="lower center", bbox_transform=main_ax.transAxes)
+            cb = plt.colorbar(sc, label='Total Pressure [Pa]', cax=cbaxes, use_gridspec=True, orientation='horizontal')
+            cb.mappable.set_clim(-600,400)
+
+            # set colorbar label plus label color
+            cb.set_label(label='Total Pressure [Pa]', color='White')
+
+            # set colorbar tick color
+            cb.ax.yaxis.set_tick_params(color='White')
+            cb.ax.xaxis.set_tick_params(color='White')
+
+            # set colorbar ticklabels
+            plt.setp(plt.getp(cb.ax.axes, 'xticklabels'), color='White')
 
             main_ax.set_title(f'CFD Results of {Parameter}')
-
+            main_ax.set_xlabel('X Coordinate [m]')
+            main_ax.set_ylabel('Y Coordinate [m]')
 
             # Plot Secondary Plot
+            ax_right.plot(df["Angle"], df["Drag_Coeff"], '-o', color="lime", linewidth=2.5, label="Drag Coefficient")
+            ax_right.plot(df["Angle"], df["Lift_Coeff"], '-o', color="violet", linewidth=2.5, label="Lift Coefficient")
 
+            ax_right_2.plot(df["Angle"], df["Lift_Drag_Ratio"], '-o', color="deepskyblue", linewidth=2.5, label="Lift/Drag Ratio")
 
-            # ax_right.suptitle(title, fontsize=12)
+            ax_right_2.annotate("",
+                                xy=(angle, lift_drag_ratio), xycoords='data',
+                                xytext=(angle, df.loc[:, "Lift_Drag_Ratio"].min()), textcoords='data',
+                                arrowprops=dict(fc="cyan", arrowstyle="->", connectionstyle="arc3"),
+                                )
 
-            ax_right.set_xlabel(f'Angle of Attack')
-            ax_right.set_title('Lift And Drag Coefficients')
-
-            # color_pallete = ['turquoise', 'springgreen', 'khaki', 'violet', 'deepskyblue', 'violet', 'peru', 'c',
-            #                  'lime',
-
-            ax_right.plot(df["Angle"], df["Drag_Coeff"], '-o', color="lime", linewidth=2.5)
-            ax_right.plot(df["Angle"], df["Lift_Coeff"], '-o', color="violet", linewidth=2.5)
-
-            ax_right_2.plot(df["Angle"], df["Lift_Drag_Ratio"], '-o', color="deepskyblue", linewidth=2.5)
-
-            # ax_right.annotate(f'Angle in figure', xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
-            #                   xytext=(df.iloc[i].loc["Angle"], 10), textcoords='data',
-            #                   arrowprops=dict(facecolor='black', shrink=0.05),
-            #                   horizontalalignment='right', verticalalignment='top',
-            #                   )
-
-            # ax_right.annotate(f'Angle in figure', (df.iloc[i].loc["Angle"], 10))
+            # if df.iloc[i].loc["Lift_Drag_Ratio"] > 10:
             #
-
-            if df.iloc[i].loc["Lift_Drag_Ratio"] > 10:
-
-                ax_right_2.annotate("",
-                                  xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
-                                  xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]-5), textcoords='data',
-                                  arrowprops=dict(fc="cyan" ,arrowstyle="->", connectionstyle="arc3"),
-                                  )
-
-            else:
-
-                ax_right_2.annotate("",
-                                    xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
-                                    xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"] + 5),
-                                    textcoords='data',
-                                    arrowprops=dict(fc="cyan", arrowstyle="->", connectionstyle="arc3"),
-                                    )
-
-            # ax_right.annotate("",
-            #                   xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Coeff"]), xycoords='data',
-            #                   xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Coeff"]-0.2), textcoords='data',
-            #                   arrowprops=dict(fc="cyan", arrowstyle="->", connectionstyle="arc3"),
-            #                   )
+            #     ax_right_2.annotate("",
+            #                       xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
+            #                       xytext=(df.iloc[i].loc["Angle"], df.loc[:,"Lift_Drag_Ratio"].min()), textcoords='data',
+            #                       arrowprops=dict(fc="cyan" ,arrowstyle="->", connectionstyle="arc3"),
+            #                       )
+            #
+            # else:
+            #
+            #     ax_right_2.annotate("",
+            #                         xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Drag_Ratio"]), xycoords='data',
+            #                         xytext=(df.iloc[i].loc["Angle"], df.loc[:,"Lift_Drag_Ratio"].min()),
+            #                         textcoords='data',
+            #                         arrowprops=dict(fc="cyan", arrowstyle="->", connectionstyle="arc3"),
+            #                         )
 
             ax_right.annotate("",
-                              xy=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Drag_Coeff"]), xycoords='data',
-                              xytext=(df.iloc[i].loc["Angle"], df.iloc[i].loc["Lift_Coeff"]), textcoords='data',
+                              xy=(angle, drag_coeff), xycoords='data',
+                              xytext=(angle, lift_coeff), textcoords='data',
                               arrowprops=dict(fc="cyan", arrowstyle="<->", connectionstyle="arc3"),
                               )
 
-            ax_right.legend()
+            ax_right.legend(loc="upper right")
+            ax_right_2.legend(loc="center")
+            ax_right_2.yaxis.set_label_position("right")
+            ax_right_2.yaxis.tick_right()
+
+            ax_right.set_xlabel(f'Angle of Attack')
+            ax_right.set_title('Lift And Drag Coefficients')
+            ax_right.yaxis.set_label_position("right")
+            ax_right.yaxis.tick_right()
+
+            ax_right_2.set_xlabel('Angle (deg)')
 
             # ax_right.scatter(x=df[x_column], y=df[y_column], linestyle='--', marker='o', s=100, label=data_name, color=color)
 
@@ -834,9 +864,12 @@ class flight_simulator(object):
             new_frame = Image.open(io_buf)
             imgs.append(new_frame)
 
-
+            # plt.show()
+            # quit()
 
             # io_buf.close()
+
+            i += 1
 
             plt.clf()
 
@@ -1167,14 +1200,16 @@ def main():
     results_test = best_results(grouped_df)
 
     sim = flight_simulator(grouped_df.loc[grouped_df["Airfoil"] == "EPPLER 58 AIRFOIL"])
+    # sim = flight_simulator(grouped_df.loc[grouped_df["Airfoil"] == "S1223"])
 
-    sim.art_plotting()
 
     sim.flow_plotting()
     sim.const_speed()
 
     # pickle.dump(sim, open("C:\\Users\\diogo\\Desktop\\perkier tech\\Drones\\Simulations\\Airfoil_Simulation_1\\Plots\\pickle_rick.p", "wb"))
     # sim = pickle.load( open("C:\\Users\\diogo\\Desktop\\perkier tech\\Drones\\Simulations\\Airfoil_Simulation_1\\Plots\\pickle_rick.p", "rb" ) )
+
+    sim.art_plotting()
 
     sim.plotting_cte_speed()
 
